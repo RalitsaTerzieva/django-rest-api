@@ -3,15 +3,15 @@ from django.test import TestCase
 
 from  rest_framework.test import APIClient
 from snippets.models import Snippet
-from snippets.factories import UserFactory
+from snippets.factories import SnippetFactory, UserFactory
 
 
 @pytest.mark.django_db
 class TestExampleTestCase(TestCase):
     def setUp(self):
         self.client = APIClient()
-        user = UserFactory.create()
-        self.client.force_login(user=user)
+        self.user = UserFactory.create()
+        self.client.force_login(user=self.user)
         
     def test_create_snippet_should_return_http_created(self):
         data = {'code': 'print("Hello!")'}
@@ -26,3 +26,13 @@ class TestExampleTestCase(TestCase):
         self.client.post('/snippets/', data=data)
         
         assert Snippet.objects.first().code == 'print("Hello!")'
+        
+        
+    def test_update_snippet_should_update_snippet_object_correctly(self):
+        data = {'code': 'print("Hello World forever!")'}
+        SnippetFactory.create(pk=1, owner=self.user)
+        
+        self.client.put('/snippets/1/', data=data)
+        
+        assert Snippet.objects.first().code == 'print("Hello World forever!")'
+        
