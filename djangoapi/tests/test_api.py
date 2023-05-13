@@ -36,3 +36,10 @@ class TestExampleTestCase(TestCase):
         
         assert Snippet.objects.first().code == 'print("Hello World forever!")'
         
+        
+    def test_delete_snippet_should_return_http_deleted(self):
+        SnippetFactory.create(pk=1, owner=self.user)
+        
+        response = self.client.delete('/snippets/1/')
+        
+        assert response.status_code == 204
